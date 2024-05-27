@@ -1,4 +1,4 @@
-from dessinAtome import DessinAtome
+from params import TYPE_ATOME
 
 class Atome:
     """
@@ -8,20 +8,11 @@ class Atome:
         dessin_atome (DessinAtome): L'objet DessinAtome associé à l'atome.
     """
 
-    def __init__(self, canvas, x, y, atom_type):
+    def __init__(self, type_atome: TYPE_ATOME):
         """
         Initialise un objet Atome.
 
         Args:
-            canvas (tkinter.Canvas): Le canvas sur lequel dessiner l'atome.
-            x (int): La coordonnée x du centre de l'atome.
-            y (int): La coordonnée y du centre de l'atome.
-            atom_type (str): Le type d'atome ('carbon' ou 'hydrogen').
+            type_atome (str): Le type d'atome ('carbon' ou 'hydrogen').
         """
-        self.dessin_atome = DessinAtome(canvas, x, y, atom_type)
-
-    def toggle_label(self):
-        """
-        Affiche ou masque le label de l'atome.
-        """
-        self.dessin_atome.toggle_label()
+        self.type = type_atome

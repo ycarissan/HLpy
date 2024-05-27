@@ -1,4 +1,4 @@
-from params import params
+from params import TYPE_ATOME, params
 
 class DessinAtome:
     """
@@ -14,7 +14,7 @@ class DessinAtome:
         label (int ou None): L'identifiant du label de l'atome (s'il existe).
     """
 
-    def __init__(self, canvas, x, y, atom_type):
+    def __init__(self, canvas, x, y, atom_type: TYPE_ATOME):
         """
         Initialise un objet DessinAtome.
 
@@ -28,7 +28,7 @@ class DessinAtome:
         self.x = x
         self.y = y
         self.atom_type = atom_type
-        self.params = params[atom_type]
+        self.params = params[atom_type.value]
         self.circle = self.draw_circle()
         self.label = self.draw_label()
 

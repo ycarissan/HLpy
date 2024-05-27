@@ -3,7 +3,7 @@ from tkinter import colorchooser
 import numpy as np
 from dessinMolecule import DessinMolecule
 
-from params import params
+from params import TYPE_ATOME, params
 
 class HulisInterface(tk.Frame):
     """
@@ -31,12 +31,14 @@ class HulisInterface(tk.Frame):
         self.create_panels()
         self.bind_events()
         self.dessinMolecule = DessinMolecule(self.canvas_molecule)
-        self.drag_atom_at_startingpoint = None
+        self.drag_dessinAtome_at_startingpoint = None
         self.drag_atom_at_endpoint = None
         self.canvas_molecule = None
+        self.atome_type_courant = TYPE_ATOME.CARBONE
 
     def create_panels(self):
         """
+        Nature : creation de interface
         Crée les panneaux de l'interface.
         """
         self.panneau_huckel   = tk.Frame(self, bg='blue',   width=int(self.master.winfo_width() * 0.1))
@@ -61,9 +63,11 @@ class HulisInterface(tk.Frame):
 
     def bind_events(self):
         """
-        Lie l'événement de touche 'l' pour afficher/masquer les labels des atomes.
+        Nature : interface, gestion des évènements
+
+        Lie les évènements aux fonctions correspondantes.
         """
-        self.canvas_molecule.bind('<Button-1>', self.add_carbon_atom)
+        self.canvas_molecule.bind('<Button-1>', self.add_atom)
         self.canvas_molecule.bind('<ButtonPress-1>', self.drag_start)
         self.canvas_molecule.bind('<ButtonRelease-1>', self.drag_stop)
         self.canvas_molecule.bind('<B1-Motion>', self.dragging)
@@ -71,51 +75,75 @@ class HulisInterface(tk.Frame):
         self.master.bind('q', self.quit_app)
 
     def drag_start(self, event):
+        """
+        Nature : interface, gestion des évènements
+
+        Demarre le drag and drop d'un atome vers un autre ou un nouvel emplacement
+        """
         x = event.x
         y = event.y
-        self.drag_atom_at_startingpoint = self.dessinMolecule.get_atom_at_position(x,y)
-        print(self.drag_atom_at_startingpoint)
-        if self.drag_atom_at_startingpoint == None:
+        self.drag_dessinAtome_at_startingpoint = self.dessinMolecule.get_dessinAtom_at_position(x,y)
+        print(self.drag_dessinAtome_at_startingpoint)
+        if self.drag_dessinAtome_at_startingpoint == None:
             print('beging dragging')
-            self.drag_atom_at_startingpoint = self.add_carbon_atom(event)
+            self.drag_dessinAtome_at_startingpoint = self.add_atom(event)
 
     def dragging(self, event):
+        """
+        Nature : interface, gestion des évènements
+
+        Action lors d'un drag and drop
+        """
         print("Dragging "+str(event.x)+" "+str(event.y))
         return
 
     def drag_stop(self, event):
+        """
+        Nature : interface, gestion des évènements
+
+        Fin du drag and drop
+        """
+        if self.drag_dessinAtome_at_startingpoint == None:
+            return
         x = event.x
         y = event.y
-        self.drag_atom_at_endpoint = self.dessinMolecule.get_atom_at_position(x,y)
+        self.drag_atom_at_endpoint = self.dessinMolecule.get_dessinAtom_at_position(x,y)
         print(self.drag_atom_at_endpoint)
-        if self.drag_atom_at_endpoint == None:
+        if self.drag_atom_at_endpoint == None or self.drag_atom_at_endpoint == self.drag_dessinAtome_at_startingpoint:
             print('end dragging')
-            self.drag_atom_at_endpoint = self.add_carbon_atom(event)
-        self.add_bond(self.drag_atom_at_startingpoint, self.drag_atom_at_endpoint)
+            self.drag_atom_at_endpoint = self.add_atom(event)
+        print(f"start: {self.drag_dessinAtome_at_startingpoint}\nstop : {self.drag_atom_at_endpoint}\n")
+        self.add_bond(event, self.drag_dessinAtome_at_startingpoint, self.drag_atom_at_endpoint)
         return
 
-    def add_carbon_atom(self, event):
+    def add_atom(self, event):
         """
+        Nature : interface, gestion des évènements
+
         Ajoute un atome de carbone à la molécule aux coordonnées du clic gauche.
 
         Args:
             event (tkinter.Event): L'événement de clic gauche.
         """
         x, y = event.x, event.y
-        return self.dessinMolecule.add_carbon_atom(x, y)
+        return self.dessinMolecule.add_atom(x, y, type=self.atome_type_courant)
     
-    def add_bond(self, atome1, atome2):
+    def add_bond(self, event, atome1, atome2):
         """
+        Nature : interface, gestion des évènements
+
         Ajoute un lien entre deux atomes de la molécule.
 
         Args:
             atome1: Le premier atome.
             atome2: Le deuxième atome.
         """
-        self.dessinMolecule.add_bond(atome1, atome2)
+        return self.dessinMolecule.add_bond(atome1, atome2)
 
     def toggle_symbols(self, event):
         """
+        Nature : interface, gestion des évènements
+
         Affiche ou masque les labels des atomes de la molécule.
 
         Args:
@@ -125,6 +153,8 @@ class HulisInterface(tk.Frame):
 
     def quit_app(self, event):
         """
+        Nature : interface, gestion des évènements
+
         Quitte l'application.
 
         Args:

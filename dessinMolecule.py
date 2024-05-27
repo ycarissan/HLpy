@@ -1,9 +1,11 @@
 import numpy as np
 
+from dessinAtome import DessinAtome
+from dessinLiaison import Dessin_liaison
 from molecule import Molecule
 from atome import Atome
 from liaison import Liaison
-from params import params
+from params import TYPE_ATOME, params
 
 class DessinMolecule:
     """
@@ -23,8 +25,10 @@ class DessinMolecule:
         """
         self.canvas = canvas
         self.molecule = Molecule()
+        self.dessins = {'atomes': [], 'liaisons': []}
+        self.correspondance = {"atome_dessin":[], "liaison_dessin":[]}
 
-    def add_carbon_atom(self, x, y):
+    def add_atom(self, x, y, type: TYPE_ATOME):
         """
         Ajoute un atome de carbone à la molécule, avec ses atomes d'hydrogène liés.
 
@@ -32,11 +36,13 @@ class DessinMolecule:
             x (int): La coordonnée x du centre de l'atome de carbone.
             y (int): La coordonnée y du centre de l'atome de carbone.
         """
-        carbon = Atome(self.canvas, x, y, 'carbon')
-        self.molecule.atomes.append(carbon)
-        hydrogens = self.draw_hydrogen_atoms(x, y, carbon)
-        self.molecule.atomes.extend(hydrogens)
-        return carbon
+        atome = self.molecule.add_atom(type)
+        dessinAtome = DessinAtome(self.canvas, x, y, type)
+        self.correspondance["atome_dessin"].append((atome, dessinAtome))
+        self.dessins['atomes'].append(dessinAtome)
+#        hydrogens = self.draw_hydrogen_atoms(x, y, atom)
+#        self.molecule.atomes.extend(hydrogens)
+        return dessinAtome
 
     def draw_hydrogen_atoms(self, x, y, carbon):
         """
@@ -62,9 +68,14 @@ class DessinMolecule:
         return hydrogens
     
     def add_bond(self, atome1, atome2):
-        liaison = Liaison(self.canvas, atome1, atome2)
-        self.molecule.liaisons.append(liaison)
-        return liaison
+        liaison = self.molecule.add_liaison(atome1, atome2)
+        dessinAtome1 = self.get_dessin_from_atome(atome1)
+        dessinAtome2 = self.get_dessin_from_atome(atome2)
+        print(liaison, dessinAtome1, dessinAtome2)
+        dessinLiaison = Dessin_liaison(self.canvas, dessinAtome1.x, dessinAtome1.y, dessinAtome2.x, dessinAtome2.y)
+        self.correspondance["liaison_dessin"].append((liaison, dessinLiaison))
+        self.dessins['liaisons'].append(dessinLiaison)
+        return dessinLiaison
 
     def toggle_symbols(self):
         """
@@ -74,9 +85,9 @@ class DessinMolecule:
         for atom in self.molecule.atomes:
             atom.toggle_label()
 
-    def get_atom_at_position(self, x, y):
+    def get_dessinAtom_at_position(self, x, y) -> DessinAtome:
         """
-        Retourne l'atome situé aux coordonnées spécifiées, ou None si aucun atome n'est présent.
+        Retourne le dessin de l'atome situé aux coordonnées spécifiées, ou None si aucun atome n'est présent.
 
         Args:
             x (int): La coordonnée x de la position.
@@ -85,10 +96,21 @@ class DessinMolecule:
         Returns:
             Atome ou None: L'objet Atome situé aux coordonnées spécifiées, ou None si aucun atome n'est présent.
         """
-        for atom in self.molecule.atomes:
-            dessin_atome = atom.dessin_atome
+        for dessin_atome in self.dessins['atomes']:
             if (dessin_atome.x - dessin_atome.params['radius'] <= x <= dessin_atome.x + dessin_atome.params['radius'] and
                 dessin_atome.y - dessin_atome.params['radius'] <= y <= dessin_atome.y + dessin_atome.params['radius']):
-                return atom
+                return dessin_atome
+        return None
+    
+    def get_atome_from_dessin(self, dessin_atome):
+        for atome, dessin in self.correspondance["atome_dessin"]:
+            if dessin == dessin_atome:
+                return atome
+        return None
+
+    def get_dessin_from_atome(self, at):
+        for atome, dessin in self.correspondance["atome_dessin"]:
+            if at == atome:
+                return dessin
         return None
 
