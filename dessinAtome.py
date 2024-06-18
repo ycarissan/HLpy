@@ -2,7 +2,7 @@ from params import params
 
 class DessinAtome:
     """
-    Classe pour dessiner un atome sur un canvas.
+    Classe  pour dessiner un atome sur un canvas.
 
     Attributs:
         canvas (tkinter.Canvas): Le canvas sur lequel dessiner l'atome.
