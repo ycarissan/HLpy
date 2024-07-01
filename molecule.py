@@ -19,8 +19,10 @@ class Molecule:
     def get_neighbours(self, atom):
         neighbours = []
         for liaison in self.liaisons:
-            if atom in liaison.atomes:
-                neighbours.append(liaison.get_other_atom(atom))
+            if atom == liaison.atome1:
+                neighbours.append(liaison.atome2)
+            elif atom == liaison.atome2:
+                neighbours.append(liaison.atome1)
         return neighbours
     
     def get_huckel_neighbours(self, atom):
@@ -49,4 +51,7 @@ class Molecule:
                     row.append(0)
             matrix.append(row)
         return matrix
+    
+    def has_free_valency(self, atom):
+        return self.get_number_of_bonds(atom) < atom.get_valence()
 

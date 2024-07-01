@@ -2,8 +2,6 @@ class Liaison:
     """
     Classe représentant une liaison.
 
-    Attributs:
-        dessin_liaison (DessinLiaison): L'objet DessinLiaison associé à la liaison.
     """
 
     def __init__(self, atome1, atome2):

@@ -70,6 +70,9 @@ class DessinMolecule:
     def add_bond(self, dessinAtome1, dessinAtome2):
         atome1 = self.get_atome_from_dessin(dessinAtome1)
         atome2 = self.get_atome_from_dessin(dessinAtome2)
+
+        if not(self.molecule.has_free_valency(atome1) and self.molecule.has_free_valency(atome2)):
+            return None
         liaison = self.molecule.add_liaison(atome1, atome2)
         print(liaison, dessinAtome1, dessinAtome2)
         dessinLiaison = Dessin_liaison(self.canvas, dessinAtome1.x, dessinAtome1.y, dessinAtome2.x, dessinAtome2.y)

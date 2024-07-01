@@ -1,4 +1,4 @@
-from params import TYPE_ATOME
+from params import *
 
 class Atome:
     """
@@ -16,3 +16,12 @@ class Atome:
             type_atome (str): Le type d'atome ('carbon' ou 'hydrogen').
         """
         self.type = type_atome
+
+    def get_valence(self):
+        """
+        Renvoie la valence de l'atome.
+
+        Returns:
+            int: La valence de l'atome.
+        """
+        return params[self.type.value]['valence']
