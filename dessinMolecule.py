@@ -67,10 +67,10 @@ class DessinMolecule:
             hydrogens.append(hydrogen)
         return hydrogens
     
-    def add_bond(self, atome1, atome2):
+    def add_bond(self, dessinAtome1, dessinAtome2):
+        atome1 = self.get_atome_from_dessin(dessinAtome1)
+        atome2 = self.get_atome_from_dessin(dessinAtome2)
         liaison = self.molecule.add_liaison(atome1, atome2)
-        dessinAtome1 = self.get_dessin_from_atome(atome1)
-        dessinAtome2 = self.get_dessin_from_atome(atome2)
         print(liaison, dessinAtome1, dessinAtome2)
         dessinLiaison = Dessin_liaison(self.canvas, dessinAtome1.x, dessinAtome1.y, dessinAtome2.x, dessinAtome2.y)
         self.correspondance["liaison_dessin"].append((liaison, dessinLiaison))

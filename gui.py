@@ -32,7 +32,7 @@ class HulisInterface(tk.Frame):
         self.bind_events()
         self.dessinMolecule = DessinMolecule(self.canvas_molecule)
         self.drag_dessinAtome_at_startingpoint = None
-        self.drag_atom_at_endpoint = None
+        self.drag_dessinAtome_at_endpoint = None
         self.canvas_molecule = None
         self.atome_type_courant = TYPE_ATOME.CARBONE
 
@@ -107,13 +107,15 @@ class HulisInterface(tk.Frame):
             return
         x = event.x
         y = event.y
-        self.drag_atom_at_endpoint = self.dessinMolecule.get_dessinAtom_at_position(x,y)
-        print(self.drag_atom_at_endpoint)
-        if self.drag_atom_at_endpoint == None or self.drag_atom_at_endpoint == self.drag_dessinAtome_at_startingpoint:
-            print('end dragging')
-            self.drag_atom_at_endpoint = self.add_atom(event)
-        print(f"start: {self.drag_dessinAtome_at_startingpoint}\nstop : {self.drag_atom_at_endpoint}\n")
-        self.add_bond(event, self.drag_dessinAtome_at_startingpoint, self.drag_atom_at_endpoint)
+        self.drag_dessinAtome_at_endpoint = self.dessinMolecule.get_dessinAtom_at_position(x,y)
+        if self.drag_dessinAtome_at_endpoint == self.drag_dessinAtome_at_startingpoint:
+            return
+        print(self.drag_dessinAtome_at_endpoint)
+        print('end dragging')
+        if self.drag_dessinAtome_at_endpoint == None:
+            self.drag_dessinAtome_at_endpoint = self.add_atom(event)
+        print(f"start: {self.drag_dessinAtome_at_startingpoint}\nstop : {self.drag_dessinAtome_at_endpoint}\n")
+        self.add_bond(event, self.drag_dessinAtome_at_startingpoint, self.drag_dessinAtome_at_endpoint)
         return
 
     def add_atom(self, event):
@@ -128,17 +130,17 @@ class HulisInterface(tk.Frame):
         x, y = event.x, event.y
         return self.dessinMolecule.add_atom(x, y, type=self.atome_type_courant)
     
-    def add_bond(self, event, atome1, atome2):
+    def add_bond(self, event, dessinAtome1, dessinAtome2):
         """
         Nature : interface, gestion des évènements
 
         Ajoute un lien entre deux atomes de la molécule.
 
         Args:
-            atome1: Le premier atome.
-            atome2: Le deuxième atome.
+            dessinAtome1: Le premier dessin d'atome.
+            dessinAtome2: Le deuxième dessin d'atome.
         """
-        return self.dessinMolecule.add_bond(atome1, atome2)
+        return self.dessinMolecule.add_bond(dessinAtome1, dessinAtome2)
 
     def toggle_symbols(self, event):
         """
