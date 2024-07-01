@@ -9,8 +9,8 @@ class TYPE_ATOME(Enum):
 
 
 params = {
-    'CARBONEsp2': {'radius': 20, 'color': 'gray', 'symbol': 'C'},
-    'HYDROGENE': {'radius': 10, 'color': 'white', 'border_color': 'black', 'symbol': 'H'},
+    'CARBONEsp2': {'radius': 20, 'color': 'gray',  'symbol': 'C', 'valence': 3, 'border_color': 'black'},
+    'HYDROGENE':  {'radius': 10, 'color': 'white', 'symbol': 'H', 'valence': 1, 'border_color': 'black'},
     'bond_color': 'red',
     'bond_width': 2,
     'show_symbols': True
