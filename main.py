@@ -1,12 +1,12 @@
 import argparse
 import numpy as np
-import wavefunction
+import chem_wavefunction
 
 def main():
     parser = argparse.ArgumentParser(description="Reads matrices from an xml file and computes the eigenvalues and eigenfunctions")
     parser.add_argument("input", help="input file in xml format containing the matrices to be analyzed", default="benzene_kekule.xml")
     args = parser.parse_args()
-    wavefunctions = wavefunction.read_wavefunctions_from_xml(args.input)
+    wavefunctions = chem_wavefunction.read_wavefunctions_from_xml(args.input)
 
     print("I have read the following wavefunctions:")
     for wf in wavefunctions:

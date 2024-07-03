@@ -10,6 +10,8 @@ class Wavefunction:
         self.update()
     
     def huckel(self):
+        if self.matrix == None or len(self.matrix) == 0:
+            return None, None, None
         # get eigenfunctions and eigenvalues from matrix using numpy
         eigenvalues, eigenfunctions = np.linalg.eigh(self.matrix)
 
@@ -50,6 +52,10 @@ class Wavefunction:
     
     def set_occupation(self, occupation):
         self.occupation = occupation
+        self.update()
+
+    def set_matrix(self, matrix):
+        self.matrix = matrix
         self.update()
 
     def get_eigenfunction(self, i):

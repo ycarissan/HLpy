@@ -30,10 +30,9 @@ class HulisInterface(tk.Frame):
         self.pack(fill='both', expand=True)
         self.create_panels()
         self.bind_events()
-        self.dessinMolecule = DessinMolecule(self.canvas_molecule)
-        self.drag_dessinAtome_at_startingpoint = None
-        self.drag_dessinAtome_at_endpoint = None
-        self.canvas_molecule = None
+        self.dessin_molecule = DessinMolecule(self.canvas_molecule)
+        self.drag_dessin_atome_at_startingpoint = None
+        self.drag_dessin_atome_at_endpoint = None
         self.atome_type_courant = TYPE_ATOME.CARBONE
 
     def create_panels(self):
@@ -82,11 +81,11 @@ class HulisInterface(tk.Frame):
         """
         x = event.x
         y = event.y
-        self.drag_dessinAtome_at_startingpoint = self.dessinMolecule.get_dessinAtom_at_position(x,y)
-        print(self.drag_dessinAtome_at_startingpoint)
-        if self.drag_dessinAtome_at_startingpoint == None:
+        self.drag_dessin_atome_at_startingpoint = self.dessin_molecule.get_dessinAtom_at_position(x,y)
+        print(self.drag_dessin_atome_at_startingpoint)
+        if self.drag_dessin_atome_at_startingpoint == None:
             print('beging dragging')
-            self.drag_dessinAtome_at_startingpoint = self.add_atom(event)
+            self.drag_dessin_atome_at_startingpoint = self.add_atom(event)
 
     def dragging(self, event):
         """
@@ -103,19 +102,19 @@ class HulisInterface(tk.Frame):
 
         Fin du drag and drop
         """
-        if self.drag_dessinAtome_at_startingpoint == None:
+        if self.drag_dessin_atome_at_startingpoint == None:
             return
         x = event.x
         y = event.y
-        self.drag_dessinAtome_at_endpoint = self.dessinMolecule.get_dessinAtom_at_position(x,y)
-        if self.drag_dessinAtome_at_endpoint == self.drag_dessinAtome_at_startingpoint:
+        self.drag_dessin_atome_at_endpoint = self.dessin_molecule.get_dessinAtom_at_position(x,y)
+        if self.drag_dessin_atome_at_endpoint == self.drag_dessin_atome_at_startingpoint:
             return
-        print(self.drag_dessinAtome_at_endpoint)
+        print(self.drag_dessin_atome_at_endpoint)
         print('end dragging')
-        if self.drag_dessinAtome_at_endpoint == None:
-            self.drag_dessinAtome_at_endpoint = self.add_atom(event)
-        print(f"start: {self.drag_dessinAtome_at_startingpoint}\nstop : {self.drag_dessinAtome_at_endpoint}\n")
-        self.add_bond(event, self.drag_dessinAtome_at_startingpoint, self.drag_dessinAtome_at_endpoint)
+        if self.drag_dessin_atome_at_endpoint == None:
+            self.drag_dessin_atome_at_endpoint = self.add_atom(event)
+        print(f"start: {self.drag_dessin_atome_at_startingpoint}\nstop : {self.drag_dessin_atome_at_endpoint}\n")
+        self.add_bond(event, self.drag_dessin_atome_at_startingpoint, self.drag_dessin_atome_at_endpoint)
         return
 
     def add_atom(self, event):
@@ -128,19 +127,19 @@ class HulisInterface(tk.Frame):
             event (tkinter.Event): L'événement de clic gauche.
         """
         x, y = event.x, event.y
-        return self.dessinMolecule.add_atom(x, y, type=self.atome_type_courant)
+        return self.dessin_molecule.add_atom(x, y, type=self.atome_type_courant)
     
-    def add_bond(self, event, dessinAtome1, dessinAtome2):
+    def add_bond(self, event, dessin_atome1, dessin_atome2):
         """
         Nature : interface, gestion des évènements
 
         Ajoute un lien entre deux atomes de la molécule.
 
         Args:
-            dessinAtome1: Le premier dessin d'atome.
-            dessinAtome2: Le deuxième dessin d'atome.
+            dessin_atome1: Le premier dessin d'atome.
+            dessin_atome2: Le deuxième dessin d'atome.
         """
-        return self.dessinMolecule.add_bond(dessinAtome1, dessinAtome2)
+        return self.dessin_molecule.add_bond(dessin_atome1, dessin_atome2)
 
     def toggle_symbols(self, event):
         """
@@ -151,7 +150,7 @@ class HulisInterface(tk.Frame):
         Args:
             event (tkinter.Event): L'événement de touche 'l'.
         """
-        self.dessinMolecule.toggle_symbols()
+        self.dessin_molecule.toggle_symbols()
 
     def quit_app(self, event):
         """
