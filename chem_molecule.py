@@ -1,5 +1,5 @@
-from atome import Atome
-from liaison import Liaison
+from chem_atome import Atome
+from chem_liaison import Liaison
 
 class Molecule:
     def __init__(self):

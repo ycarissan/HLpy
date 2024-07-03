@@ -1,10 +1,10 @@
 import numpy as np
 
-from dessinAtome import DessinAtome
-from dessinLiaison import Dessin_liaison
-from molecule import Molecule
-from atome import Atome
-from liaison import Liaison
+from dessin_atome import DessinAtome
+from dessin_liaison import Dessin_liaison
+from chem_molecule import Molecule
+from chem_atome import Atome
+from chem_liaison import Liaison
 from params import TYPE_ATOME, params
 
 class DessinMolecule:

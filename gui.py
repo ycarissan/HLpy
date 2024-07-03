@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import colorchooser
 import numpy as np
-from dessinMolecule import DessinMolecule
+from dessin_molecule import DessinMolecule
 
 from params import TYPE_ATOME, params
 
