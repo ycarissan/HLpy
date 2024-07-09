@@ -29,6 +29,9 @@ class DessinAtome:
         self.y = y
         self.atom_type = atom_type
         self.params = params[atom_type.value]
+        self.draw()
+
+    def draw(self):
         self.circle = self.draw_circle()
         self.label = self.draw_label()
 

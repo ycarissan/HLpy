@@ -6,6 +6,7 @@ from chem_molecule import Molecule
 from chem_atome import Atome
 from chem_liaison import Liaison
 from params import TYPE_ATOME, params
+import pymunk
 
 class DessinMolecule:
     """
@@ -40,45 +41,29 @@ class DessinMolecule:
         dessinAtome = DessinAtome(self.canvas, x, y, type)
         self.correspondance["atome_dessin"].append((atome, dessinAtome))
         self.dessins['atomes'].append(dessinAtome)
-#        hydrogens = self.draw_hydrogen_atoms(x, y, atom)
-#        self.molecule.atomes.extend(hydrogens)
+        if atome.type.value == "CARBONEsp2":
+            for i in range(3):
+                hydrogen = self.molecule.add_atom(TYPE_ATOME.HYDROGENE)
+                xH = x + 50*np.cos(2*np.pi/3*(i+1))
+                yH = y + 50*np.sin(2*np.pi/3*(i+1))
+                dessinHydrogen = DessinAtome(self.canvas, xH, yH, TYPE_ATOME.HYDROGENE)
+                self.correspondance["atome_dessin"].append((hydrogen, dessinHydrogen))
+                self.dessins['atomes'].append(dessinHydrogen)
+                self.add_bond(self.get_dessin_from_atome(atome), dessinHydrogen)
         return dessinAtome
 
-    def draw_hydrogen_atoms(self, x, y, carbon):
-        """
-        Dessine les atomes d'hydrogène liés à un atome de carbone.
-
-        Args:
-            x (int): La coordonnée x du centre de l'atome de carbone.
-            y (int): La coordonnée y du centre de l'atome de carbone.
-            carbon (Atome): L'objet Atome représentant l'atome de carbone.
-
-        Returns:
-            list: La liste des objets Atome représentant les atomes d'hydrogène dessinés.
-        """
-        hydrogen_params = params['hydrogen']
-        bond_length = params['carbon']['radius'] + hydrogen_params['radius'] + params['bond_width']
-        hydrogens = []
-        for angle in [0, 120, 240]:
-            x_h = x + bond_length * np.cos(np.radians(angle))
-            y_h = y + bond_length * np.sin(np.radians(angle))
-            hydrogen = Atome(self.canvas, x_h, y_h, 'hydrogen')
-            self.canvas.create_line(x, y, x_h, y_h, fill=params['bond_color'], width=params['bond_width'])
-            hydrogens.append(hydrogen)
-        return hydrogens
-    
-    def add_bond(self, dessinAtome1, dessinAtome2):
-        atome1 = self.get_atome_from_dessin(dessinAtome1)
-        atome2 = self.get_atome_from_dessin(dessinAtome2)
+    def add_bond(self, dessin_atome1, dessin_atome2):
+        atome1 = self.get_atome_from_dessin(dessin_atome1)
+        atome2 = self.get_atome_from_dessin(dessin_atome2)
 
         if not(self.molecule.has_free_valency(atome1) and self.molecule.has_free_valency(atome2)):
             return None
-        liaison = self.molecule.add_liaison(atome1, atome2)
-        print(liaison, dessinAtome1, dessinAtome2)
-        dessinLiaison = Dessin_liaison(self.canvas, dessinAtome1.x, dessinAtome1.y, dessinAtome2.x, dessinAtome2.y)
-        self.correspondance["liaison_dessin"].append((liaison, dessinLiaison))
-        self.dessins['liaisons'].append(dessinLiaison)
-        return dessinLiaison
+        liaison = self.molecule.add_bond(atome1, atome2)
+        #print(liaison, dessin_atome1, dessin_atome2)
+        dessin_liaison = Dessin_liaison(self.canvas, dessin_atome1, dessin_atome2)
+        self.correspondance["liaison_dessin"].append((liaison, dessin_liaison))
+        self.dessins['liaisons'].append(dessin_liaison)
+        return dessin_liaison
 
     def toggle_symbols(self):
         """
@@ -116,4 +101,49 @@ class DessinMolecule:
             if at == atome:
                 return dessin
         return None
+    
+    def redraw(self):
+        """
+        Redessine la molécule sur le canvas.
+        """
+        self.canvas.delete("all")
+        for dessin_atome in self.dessins['atomes']:
+            dessin_atome.draw()
+        for dessin_liaison in self.dessins['liaisons']:
+            dessin_liaison.draw()
+    
+    def optimize(self):
+        """
+        Optimize the molecule with the pymunk physics engine using springs between bound atoms.
+        """
+        space = pymunk.Space()
+        space.gravity = (0, 0)  # No gravity
+
+        for dessin_atome in self.dessins['atomes']:
+            body = pymunk.Body()
+            body.position = (dessin_atome.x, dessin_atome.y)
+            shape = pymunk.Circle(body, dessin_atome.params['radius'])
+            shape.mass = 10
+            space.add(body, shape)
+            dessin_atome.body = body
+            dessin_atome.shape = shape
+        
+        for liaison, dessin_liaison in self.correspondance["liaison_dessin"]:
+            atome1 = liaison.atome1
+            atome2 = liaison.atome2
+            dessinAtome1 = self.get_dessin_from_atome(atome1)
+            dessinAtome2 = self.get_dessin_from_atome(atome2)
+            body1 = dessinAtome1.body
+            body2 = dessinAtome2.body
+            spring = pymunk.DampedSpring(body1, body2, (0, 0), (0, 0), 100, 100, 0.5)
+            space.add(spring)
+
+        for i in range(10000):
+            space.step(1/50)
+            for dessin_atome in self.dessins['atomes']:
+                dessin_atome.x, dessin_atome.y = dessin_atome.body.position
+            self.redraw()
+            self.canvas.update()
+
+
 

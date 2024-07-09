@@ -15,7 +15,7 @@ class Dessin_liaison:
         label (int ou None): L'identifiant du label de la liaison (s'il existe).
     """
 
-    def __init__(self, canvas, x1, y1, x2, y2):
+    def __init__(self, canvas, dessin_atome1, dessin_atome2):
         """
         Initialise un objet DessinLiaison.
 
@@ -27,12 +27,13 @@ class Dessin_liaison:
         y2 (int): La coordonnée y du centre de l'atome2.
         """
         self.canvas = canvas
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
+        self.dessin_atome1 = dessin_atome1
+        self.dessin_atome2 = dessin_atome2
         self.color = params['bond_color']
         self.width = params['bond_width']
+        self.draw()
+
+    def draw(self):
         self.line = self.draw_line()
         self.label = self.draw_label()
 
@@ -43,10 +44,10 @@ class Dessin_liaison:
         Returns:
             int: L'identifiant de la ligne dessinée.
         """
-        x1 = self.x1
-        y1 = self.y1
-        x2 = self.x2
-        y2 = self.y2
+        x1 = self.dessin_atome1.x
+        y1 = self.dessin_atome1.y   
+        x2 = self.dessin_atome2.x
+        y2 = self.dessin_atome2.y
         return self.canvas.create_line(x1, y1, x2, y2, fill=self.color, width=self.width)
 
     def draw_label(self):
@@ -57,5 +58,9 @@ class Dessin_liaison:
             int ou None: L'identifiant du label dessiné, ou None si aucun label n'est dessiné.
         """
         if params['show_symbols']:
-            return self.canvas.create_text((self.x1+self.x2)*0.5, (self.y1+self.y2)*0.5, text="Liaison")
+            x1 = self.dessin_atome1.x
+            y1 = self.dessin_atome1.y   
+            x2 = self.dessin_atome2.x
+            y2 = self.dessin_atome2.y
+            return self.canvas.create_text((x1+x2)*0.5, (y1+y2)*0.5, text="Liaison")
         return None

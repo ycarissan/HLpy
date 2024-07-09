@@ -31,7 +31,7 @@ class HulisInterface(tk.Frame):
         self.create_panels()
         self.bind_events()
         self.dessin_molecule = DessinMolecule(self.canvas_molecule)
-        self.drag_dessin_atome_at_startingpoint = None
+        self.qg_dessin_atome_at_startingpoint = None
         self.drag_dessin_atome_at_endpoint = None
         self.atome_type_courant = TYPE_ATOME.CARBONE
 
@@ -71,6 +71,7 @@ class HulisInterface(tk.Frame):
         self.canvas_molecule.bind('<ButtonRelease-1>', self.drag_stop)
         self.canvas_molecule.bind('<B1-Motion>', self.dragging)
         self.master.bind('l', self.toggle_symbols)
+        self.master.bind('o', self.optimize_molecule)
         self.master.bind('q', self.quit_app)
 
     def drag_start(self, event):
@@ -163,6 +164,16 @@ class HulisInterface(tk.Frame):
         """
         self.master.quit()
 
+    def optimize_molecule(self, event):
+        """
+        Nature : interface, gestion des évènements
+
+        Optimise la molécule.
+
+        Args:
+            event (tkinter.Event): L'événement de touche 'o'.
+        """
+        self.dessin_molecule.optimize()
           
 def main():
     """

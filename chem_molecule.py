@@ -1,7 +1,7 @@
 from chem_atome import Atome
 from chem_liaison import Liaison
 from chem_wavefunction import Wavefunction
-from params import TYPE_ATOME
+from params import params,TYPE_ATOME
 
 class Molecule:
     def __init__(self):
@@ -16,10 +16,11 @@ class Molecule:
     def add_atom(self, type: TYPE_ATOME):
         atome = Atome(type)
         self.atomes.append(atome)
-        self.update_wavefunction()
+        if params[type.value]['isHuckel']:
+            self.update_wavefunction()
         return atome
     
-    def add_liaison(self, atom1: Atome, atom2: Atome):
+    def add_bond(self, atom1: Atome, atom2: Atome):
         liaison = Liaison(atom1, atom2)
         self.liaisons.append(liaison)
         self.update_wavefunction()
@@ -39,7 +40,7 @@ class Molecule:
         for liaison in self.liaisons:
             if atom in (liaison.atome1, liaison.atome2):
                 other_atom = liaison.get_other_atom(atom)
-                if other_atom.type != "hydrogen":
+                if other_atom.type != "HYDROGENE":
                     huckel_neighbours.append(other_atom)
         return huckel_neighbours
     
@@ -62,5 +63,6 @@ class Molecule:
         return matrix
     
     def has_free_valency(self, atom: Atome):
-        return self.get_number_of_bonds(atom) < atom.get_valence()
+        print("all huckel valence : ",self.get_number_of_bonds(atom), self.get_number_of_huckel_bonds(atom), atom.get_valence())
+        return self.get_number_of_huckel_bonds(atom) < atom.get_valence()
 
