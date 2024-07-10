@@ -66,6 +66,9 @@ class Molecule:
         self.atomes.remove(atom)
         for liaison in self.liaisons:
             if atom in (liaison.atome1, liaison.atome2):
+                other_atom = liaison.get_other_atom(atom)
+                if other_atom.type == TYPE_ATOME.HYDROGENE:
+                    self.atomes.remove(other_atom)
                 self.liaisons.remove(liaison)
         self.update_wavefunction()
         return

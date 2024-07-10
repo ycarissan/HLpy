@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import colorchooser
 import numpy as np
-from dessin_molecule import DessinMolecule
+import control_center
 
 from params import TYPE_ATOME, params
 
@@ -30,8 +30,8 @@ class HulisInterface(tk.Frame):
         self.pack(fill='both', expand=True)
         self.create_panels()
         self.bind_events()
-        self.dessin_molecule = DessinMolecule(self.canvas_molecule)
-        self.qg_dessin_atome_at_startingpoint = None
+        self.control_center = control_center.Control_Center(self.canvas_molecule)
+        self.drag_dessin_atome_at_startingpoint = None
         self.drag_dessin_atome_at_endpoint = None
         self.atome_type_courant = TYPE_ATOME.CARBONE
 
@@ -83,7 +83,7 @@ class HulisInterface(tk.Frame):
         """
         x = event.x
         y = event.y
-        self.drag_dessin_atome_at_startingpoint = self.dessin_molecule.get_dessinAtom_at_position(x,y)
+        self.drag_dessin_atome_at_startingpoint = self.control_center.get_dessinAtom_at_position(x,y)
         print(self.drag_dessin_atome_at_startingpoint)
         if self.drag_dessin_atome_at_startingpoint == None:
             print('beging dragging')
@@ -108,7 +108,7 @@ class HulisInterface(tk.Frame):
             return
         x = event.x
         y = event.y
-        self.drag_dessin_atome_at_endpoint = self.dessin_molecule.get_dessinAtom_at_position(x,y)
+        self.drag_dessin_atome_at_endpoint = self.control_center.get_dessinAtom_at_position(x,y)
         if self.drag_dessin_atome_at_endpoint == self.drag_dessin_atome_at_startingpoint:
             return
         print(self.drag_dessin_atome_at_endpoint)
@@ -129,7 +129,7 @@ class HulisInterface(tk.Frame):
             event (tkinter.Event): L'événement de clic gauche.
         """
         x, y = event.x, event.y
-        return self.dessin_molecule.add_atom(x, y, type=self.atome_type_courant)
+        return self.control_center.add_atom(x, y, type=self.atome_type_courant)
     
     def remove_atom(self, event):
         """
@@ -141,9 +141,9 @@ class HulisInterface(tk.Frame):
             event (tkinter.Event): L'événement de clic droit.
         """
         x, y = event.x, event.y
-        dessin_atome = self.dessin_molecule.get_dessinAtom_at_position(x, y)
+        dessin_atome = self.control_center.get_dessinAtom_at_position(x, y)
         if dessin_atome is not None:
-            self.dessin_molecule.remove_atom(dessin_atome)
+            self.control_center.remove_atom(dessin_atome)
         return
     
     def add_bond(self, event, dessin_atome1, dessin_atome2):
@@ -156,7 +156,7 @@ class HulisInterface(tk.Frame):
             dessin_atome1: Le premier dessin d'atome.
             dessin_atome2: Le deuxième dessin d'atome.
         """
-        return self.dessin_molecule.add_bond(dessin_atome1, dessin_atome2)
+        return self.control_center.add_bond(dessin_atome1, dessin_atome2)
 
     def toggle_symbols(self, event):
         """
@@ -167,7 +167,7 @@ class HulisInterface(tk.Frame):
         Args:
             event (tkinter.Event): L'événement de touche 'l'.
         """
-        self.dessin_molecule.toggle_symbols()
+        self.control_center.toggle_symbols()
 
     def quit_app(self, event):
         """
@@ -189,7 +189,7 @@ class HulisInterface(tk.Frame):
         Args:
             event (tkinter.Event): L'événement de touche 'o'.
         """
-        self.dessin_molecule.optimize()
+        self.control_center.optimize()
           
 def main():
     """
