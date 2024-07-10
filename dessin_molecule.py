@@ -38,19 +38,44 @@ class DessinMolecule:
             y (int): La coordonnée y du centre de l'atome de carbone.
         """
         atome = self.molecule.add_atom(type)
-        dessinAtome = DessinAtome(self.canvas, x, y, type)
-        self.correspondance["atome_dessin"].append((atome, dessinAtome))
-        self.dessins['atomes'].append(dessinAtome)
+        dessinAtome = self.add_dessin_atome(x, y, type, atome)
         if atome.type.value == "CARBONEsp2":
             for i in range(3):
                 hydrogen = self.molecule.add_atom(TYPE_ATOME.HYDROGENE)
                 xH = x + 50*np.cos(2*np.pi/3*(i+1))
                 yH = y + 50*np.sin(2*np.pi/3*(i+1))
-                dessinHydrogen = DessinAtome(self.canvas, xH, yH, TYPE_ATOME.HYDROGENE)
-                self.correspondance["atome_dessin"].append((hydrogen, dessinHydrogen))
-                self.dessins['atomes'].append(dessinHydrogen)
+                dessinHydrogen = self.add_dessin_atome(xH, yH, TYPE_ATOME.HYDROGENE, hydrogen)
                 self.add_bond(self.get_dessin_from_atome(atome), dessinHydrogen)
         return dessinAtome
+
+    def add_dessin_atome(self, x, y, type, atome):
+        dessinAtome = DessinAtome(self.canvas, x, y, type)
+        self.correspondance["atome_dessin"].append((atome, dessinAtome))
+        self.dessins['atomes'].append(dessinAtome)
+        return dessinAtome
+    
+    def remove_atom(self, dessin_atome):
+        atome = self.get_atome_from_dessin(dessin_atome)
+        self.molecule.remove_atom(atome)
+        self.remove_dessin_atome(dessin_atome, atome)
+
+    def remove_dessin_atome(self, dessin_atome, atome):
+        self.dessins['atomes'].remove(dessin_atome)
+        self.correspondance["atome_dessin"].remove((atome, dessin_atome))
+        self.redraw()
+
+    def remove_liaison(self, dessin_liaison):
+        liaison = None
+        for l, dessin in self.correspondance["liaison_dessin"]:
+            if dessin == dessin_liaison:
+                liaison = l
+                break
+        if liaison is None:
+            return
+        self.molecule.remove_bond(liaison)
+        self.correspondance["liaison_dessin"].remove((liaison, dessin_liaison))
+        self.dessins['liaisons'].remove(dessin_liaison)
+        self.red
 
     def add_bond(self, dessin_atome1, dessin_atome2):
         atome1 = self.get_atome_from_dessin(dessin_atome1)
@@ -59,19 +84,50 @@ class DessinMolecule:
         if not(self.molecule.has_free_valency(atome1) and self.molecule.has_free_valency(atome2)):
             return None
         liaison = self.molecule.add_bond(atome1, atome2)
+        self.replace_hydrogen_closest_to(atome1,atome2)
+        self.replace_hydrogen_closest_to(atome2,atome1)
         #print(liaison, dessin_atome1, dessin_atome2)
         dessin_liaison = Dessin_liaison(self.canvas, dessin_atome1, dessin_atome2)
         self.correspondance["liaison_dessin"].append((liaison, dessin_liaison))
         self.dessins['liaisons'].append(dessin_liaison)
         return dessin_liaison
+    
+    def replace_hydrogen_closest_to(self, atome1: Atome, atome2: Atome):
+        """
+        Removes the hydrogen atom, which has a bond with atom1 and is closest to atom2
+        """
+        if atome1.type.value != "HYDROGENE" or atome2.type.value != "HYDROGENE":
+            return
+        #Look for the hydrogen atoms, which have a bond with atom1:
+        hydrogens = self.molecule.get_non_huckel_neighbours(atome1)
+        if len(hydrogens) == 0:
+            raise Exception("No hydrogen atom found but expected: the test must have been done before!")
+        #Look for the hydrogen atom, which is closest to atom2:
+        closest_hydrogen = hydrogens[0]
+        closest_distance = self.get_distance(atome2,closest_hydrogen)
+        for hydrogen in hydrogens:
+            distance = self.get_distance(atome2,closest_hydrogen)
+            if distance < closest_distance:
+                closest_hydrogen = hydrogen
+                closest_distance = distance
+        self.remove_atom(self.get_dessin_from_atome(closest_hydrogen))
+
+    def get_distance(self, atome1, atome2):
+        dessinAtome1 = self.get_dessin_from_atome(atome1)
+        dessinAtome2 = self.get_dessin_from_atome(atome2)
+        x1 = dessinAtome1.x
+        y1 = dessinAtome1.y
+        x2 = dessinAtome2.x
+        y2 = dessinAtome2.y
+        return np.sqrt((x1-x2)**2 + (y1-y2)**2)
 
     def toggle_symbols(self):
         """
         Affiche ou masque les labels de tous les atomes de la molécule.
         """
         params['show_symbols'] = not params['show_symbols']
-        for atom in self.molecule.atomes:
-            atom.toggle_label()
+        for dessin_atome in self.dessins['atomes']:
+            dessin_atome.toggle_label()
 
     def get_dessinAtom_at_position(self, x, y) -> DessinAtome:
         """

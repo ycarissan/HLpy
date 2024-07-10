@@ -15,3 +15,6 @@ params = {
     'bond_width': 2,
     'show_symbols': True
 }
+
+def isHuckel(type):
+    return params[type]['isHuckel']

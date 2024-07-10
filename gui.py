@@ -67,6 +67,7 @@ class HulisInterface(tk.Frame):
         Lie les évènements aux fonctions correspondantes.
         """
         self.canvas_molecule.bind('<Button-1>', self.add_atom)
+        self.canvas_molecule.bind('<Button-3>', self.remove_atom)
         self.canvas_molecule.bind('<ButtonPress-1>', self.drag_start)
         self.canvas_molecule.bind('<ButtonRelease-1>', self.drag_stop)
         self.canvas_molecule.bind('<B1-Motion>', self.dragging)
@@ -94,7 +95,7 @@ class HulisInterface(tk.Frame):
 
         Action lors d'un drag and drop
         """
-        print("Dragging "+str(event.x)+" "+str(event.y))
+#        print("Dragging "+str(event.x)+" "+str(event.y))
         return
 
     def drag_stop(self, event):
@@ -129,6 +130,21 @@ class HulisInterface(tk.Frame):
         """
         x, y = event.x, event.y
         return self.dessin_molecule.add_atom(x, y, type=self.atome_type_courant)
+    
+    def remove_atom(self, event):
+        """
+        Nature : interface, gestion des évènements
+
+        Supprime un atome de la molécule aux coordonnées du clic droit.
+
+        Args:
+            event (tkinter.Event): L'événement de clic droit.
+        """
+        x, y = event.x, event.y
+        dessin_atome = self.dessin_molecule.get_dessinAtom_at_position(x, y)
+        if dessin_atome is not None:
+            self.dessin_molecule.remove_atom(dessin_atome)
+        return
     
     def add_bond(self, event, dessin_atome1, dessin_atome2):
         """
