@@ -1,4 +1,5 @@
 from params import params
+from dessin_atome import DessinAtome
 
 class Dessin_liaison:
     """
@@ -15,7 +16,7 @@ class Dessin_liaison:
         label (int ou None): L'identifiant du label de la liaison (s'il existe).
     """
 
-    def __init__(self, canvas, dessin_atome1, dessin_atome2):
+    def __init__(self, canvas, dessin_atome1: DessinAtome, dessin_atome2: DessinAtome):
         """
         Initialise un objet DessinLiaison.
 
